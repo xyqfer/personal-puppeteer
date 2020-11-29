@@ -2,7 +2,7 @@
   "routes": [
     {
       "src": "/([^/]+).png",
-      "dest": "/api/image?jwt=$1&type=png"
+      "dest": "/api/image?url=$1&type=png"
     },
     {
       "src": "/([^/]+).jpg",
