@@ -1,43 +1,20 @@
 import { NowRequest, NowResponse } from '@vercel/node'
 import { launch, Page } from 'puppeteer-core'
 import chrome from 'chrome-aws-lambda'
-import { decode, verify } from 'jsonwebtoken'
-import { allowList } from './auth'
 
 let _page: Page | null
 
 export default async function (req: NowRequest, res: NowResponse) {
   try {
-    const jwt = String(req.query.jwt)
-    const issuer = String((decode(jwt) as any)?.iss)
-    if (!Object.prototype.hasOwnProperty.call(allowList, issuer)) {
-      res.status(401).json({ error: { message: 'Unrecognized issuer.' } })
-      return
-    }
-    const registeredIssuer = allowList[issuer]
-    const payload = verify(jwt, registeredIssuer.publicKey, {
-      algorithms: ['RS256'],
-      issuer: issuer,
-    }) as any
     const type = String(req.query.type) === 'jpeg' ? 'jpeg' : ('png' as const)
-    const url = String(payload.url)
-    const waitUntil = (() => {
-      const allowedValues = [
-        'load',
-        'domcontentloaded',
-        'networkidle0',
-        'networkidle2',
-      ] as const
-      const value = String(payload.waitUntil)
-      const index = allowedValues.indexOf(value as any)
-      return allowedValues[index] || 'load'
-    })()
+    const url = String(req.query.url)
+    const waitUntil = 'load'
     const result = await renderImage({
       url,
       type,
-      width: +payload.width || 1280,
-      height: +payload.height || 720,
-      deviceScaleFactor: +payload.deviceScaleFactor || 1,
+      width: 1280,
+      height: 720,
+      deviceScaleFactor: 1,
       waitUntil,
     })
     res.setHeader('Content-Type', 'image/' + type)
