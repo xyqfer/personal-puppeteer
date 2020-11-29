@@ -12,8 +12,8 @@ export default async function (req: NowRequest, res: NowResponse) {
     const result = await renderImage({
       url,
       type,
-      width: 1280,
-      height: 720,
+      width: 375,
+      height: 2000,
       deviceScaleFactor: 1,
       waitUntil,
     })
